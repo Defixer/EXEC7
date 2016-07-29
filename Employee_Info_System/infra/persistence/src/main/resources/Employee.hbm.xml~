@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="com.hibernate.exercise6.model.Employee" table="EMPLOYEE">
+		<meta attribute="class-description">
+		This class contains the employee detail.
+		</meta>
+	<id name="id" type="int" column="ID">
+		<generator class="increment"></generator>
+	</id>
+		<component name="Name" class="com.hibernate.exercise6.model.Name">
+		<property name="title" column="TITLE" type="string"/>
+		<property name="firstName" column="FIRST_NAME" type="string"/>
+		<property name="middleName" column="MIDDLE_NAME" type="string"/>
+		<property name="lastName" column="LAST_NAME" type="string"/>
+		<property name="suffix" column="SUFFIX" type="string"/>
+		</component>
+		<component name="Address" class="com.hibernate.exercise6.model.Address">
+			<property name="streetNo" column="STREET_NO" type="string"/>
+			<property name="brgy" column="BRGY" type="string"/>
+			<property name="cityMunicipality" column="CITY_MUNICIPALITY" type="string"/>
+			<property name="zipcode" column="ZIPCODE" type="string"/>
+		</component>
+		<component name="OtherInfo" class="com.hibernate.exercise6.model.OtherInfo">
+			<property name="birthday" column="BIRTHDAY" type="date"/>
+			<property name="hireDate" column="HIRE_DATE" type="date"/>
+			<property name="gwa" column="GWA" type="double"/>
+			<property name="isEmployed" column="IS_EMPLOYED" type="boolean"/>
+		</component>
+		<set name="contacts" cascade="all">
+			<key column="employee_id"/>
+			<one-to-many class="com.hibernate.exercise6.model.Contact"/>
+		</set>
+		<set name="role" cascade="save-update" table="EMPLOYEE_ROLE">
+			<key column="employee_id"/>
+			<many-to-many column="role_id" class="com.hibernate.exercise6.model.Role"/>
+		</set>
+	</class>
+	<class name="com.hibernate.exercise6.model.Contact" table="CONTACT">
+		<meta attribute="class-description">
+			This class contains the contact records
+		</meta>
+		<id name="id" type="int" column="ID">
+			<generator class="increment"></generator>
+		</id>
+		<property name="contactDetails" column="CONTACT_DETAILS" type="string"/>
+		<property name="contactType" column="CONTACT_TYPE" type="string"/>
+	</class>
+	<class name="com.hibernate.exercise6.model.Role" table="ROLE">
+		<meta attribute="class-description">
+			This class contains the role records
+		</meta>
+		<id name="id" type="int" column="ID">
+			<generator class="increment"></generator>
+		</id>
+		<property name="roleName" column="ROLE_NAME" type="string"/>
+		<set name="employee" table="EMPLOYEE_ROLE" inverse="true">
+			<key column="role_id"/>
+			<many-to-many class="com.hibernate.exercise6.model.Employee" column="employee_id"/>
+		</set>
+	</class>
+</hibernate-mapping>

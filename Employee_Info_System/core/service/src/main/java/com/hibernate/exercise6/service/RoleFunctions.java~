@@ -1,0 +1,294 @@
+package com.hibernate.exercise6.service;
+
+import com.hibernate.exercise6.dao.PersonDAO;
+import com.hibernate.exercise6.dao.RoleDAO;
+import com.hibernate.exercise6.model.Employee;
+import com.hibernate.exercise6.model.Name;
+import com.hibernate.exercise6.model.Address;
+import com.hibernate.exercise6.model.OtherInfo;
+import com.hibernate.exercise6.model.Contact;
+import com.hibernate.exercise6.model.Role;
+import com.hibernate.exercise6.utilities.HibernateUtil;
+
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.text.MessageFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Scanner;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Date;
+import java.util.NoSuchElementException;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class RoleFunctions{
+	RoleDAO roleDAO = new RoleDAO();
+	private HibernateUtil hibernateUtil = new HibernateUtil();
+	private Scanner scan = new Scanner(System.in);
+	private Role role;
+	private	Role thisRole;
+	private Employee employee;
+	
+	public boolean addNewRoleToDB(String roleName){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopRoleMenu = true;
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			role = new Role(roleName);
+					
+			
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
+		
+		roleDAO.addNewRole(role);	
+		return loopRoleMenu;
+	}
+	
+	public boolean deleteRoleFromDB(int roleID){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopRoleMenu = true;
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			thisRole = (Role)session.get(Role.class, roleID);
+		
+			
+			
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
+				
+		roleDAO.deleteRole(thisRole);
+		return loopRoleMenu;
+	}
+	
+	public boolean addRoleToEmployee(Integer employeeID, int roleID){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopRoleMenu = true;
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			thisRole = (Role)session.get(Role.class, roleID);
+			employee = (Employee)session.get(Employee.class, employeeID);
+			Set roles = employee.getRole();
+			roles.add(thisRole);
+			employee.setRole(roles);			
+			
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
+		
+		roleDAO.addRoleToEmployee(employee);	
+		return loopRoleMenu;
+	}
+	
+	public boolean deleteRoleFromEmployee(int employeeID, int roleID){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopRoleMenu = true;
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			employee = (Employee)session.get(Employee.class, employeeID);
+			thisRole = (Role)session.get(Role.class, roleID);
+			Set roles = employee.getRole();
+			roles.remove(thisRole);
+			
+			
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}	
+		
+		roleDAO.deleteRoleFromEmployee(employee);			
+		return loopRoleMenu;
+	}
+	
+	public boolean switchUpdateRoles(int roleID, String roleName){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopRecordMenu = true;
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			thisRole = (Role)session.get(Role.class, roleID);
+			thisRole.setRoleName(roleName);			
+			
+			
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}
+		
+		roleDAO.updateRoles(thisRole);
+		return loopRecordMenu;		
+	}
+	
+	public void displayEmployeeRole(Integer employeeID){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			
+			employee = (Employee)session.get(Employee.class, employeeID);
+			Set roles = employee.getRole();
+			
+			Name name = employee.getName();			
+			
+			System.out.println("\n\t\tID   Name");
+			System.out.println("\t\t" + employee.getId() + "  " + name.getFirstName() + " " + name.getMiddleName() + " " + name.getLastName());
+			System.out.println("\n\t\tROLES");
+			for(Iterator roleIterator = roles.iterator(); roleIterator.hasNext();){
+				role = (Role)roleIterator.next();
+				System.out.println("\t\t[" + role.getId() + "] " + role.getRoleName());
+			}
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean roleList(){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopRoleMenu = true;
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		try{
+			transaction = session.beginTransaction();
+			List roleList = session.createQuery("FROM Role").list();
+			System.out.println("\n\t\tROLES");
+			for(Iterator roleIterator = roleList.iterator(); roleIterator.hasNext();){
+					role = (Role)roleIterator.next();
+				
+					System.out.println("\t\t[" + role.getId() + "] " + role.getRoleName());
+			}	
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}finally{
+			session.close();
+		}					
+		
+		return loopRoleMenu;			
+	}
+	
+	public void roleList(List roleList){	
+		for(Iterator roleIterator = roleList.iterator(); roleIterator.hasNext();){
+				role = (Role)roleIterator.next();
+		
+				System.out.println("\t[" + role.getId() + "] " + role.getRoleName());
+		}	
+	}
+	
+	public boolean displayRoleEmployeesList(){
+		boolean loopRoleMenu = true;
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			List roleList = session.createQuery("FROM Role").list();
+			System.out.println("");
+			for(Iterator roleIterator = roleList.iterator(); roleIterator.hasNext();){
+				Role role = (Role)roleIterator.next();
+				System.out.println("\t[" + role.getId() + "] " + role.getRoleName() + " ");
+				Set employees = role.getEmployee();
+				List thisRoleEmployees = roleEmployeesToList(employees);
+				for(Iterator employeeIterator = thisRoleEmployees.iterator(); employeeIterator.hasNext();){
+					String employeeName = (String)employeeIterator.next();
+					
+					System.out.println("\t\t" + employeeName);
+				}
+				System.out.println("");
+			}
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}finally{
+			session.close();
+		}
+		
+		return loopRoleMenu;
+	}
+	
+	public List roleEmployeesToList(Set employees){
+		List thisRoleEmployees = new ArrayList();
+		
+		for(Iterator employeeIterator = employees.iterator(); employeeIterator.hasNext();){
+			Employee employee = (Employee)employeeIterator.next();
+			Name name = employee.getName();
+			thisRoleEmployees.add("[" + employee.getId() + "] " +name.getFirstName() + " " + name.getLastName());
+		}
+		
+		return thisRoleEmployees;
+	}		
+}

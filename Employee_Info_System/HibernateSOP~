@@ -1,0 +1,110 @@
+Hibernate SOP
+Employee_Info_System
+    ├── app
+    │   ├── READ ME
+    │   ├── READ ME~
+    │   └── src
+    │       └── main
+    │           └── java
+    │               └── com
+    │                   └── hibernate
+    │                       └── exercise6
+    │                           └── GUI.java
+    ├── core
+    │   ├── dao
+    │   │   ├── READ ME
+    │   │   └── src
+    │   │       ├── main
+    │   │       │   └── java
+    │   │       │       └── com
+    │   │       │           └── hibernate
+    │   │       │               └── exercise6
+    │   │       │                   └── EmployeeDAO.java
+    │   │       └── READ ME~
+    │   ├── model
+    │   │   ├── READ ME
+    │   │   ├── READ ME~
+    │   │   └── src
+    │   │       └── main
+    │   │           └── java
+    │   │               └── com
+    │   │                   └── hibernate
+    │   │                       └── exercise6
+    │   │                           └── Employee.java
+    │   └── service
+    │       ├── READ ME
+    │       ├── READ ME~
+    │       └── src
+    │           └── main
+    │               └── java
+    │                   └── com
+    │                       └── hibernate
+    │                           └── exercise6
+    │                               └── EmployeeFunctions.java
+    ├── HibernateSOP
+    ├── HibernateSOP~
+    ├── infra
+    │   ├── buildTools
+    │   │   ├── READ ME
+    │   │   ├── READ ME~
+    │   │   └── src
+    │   │       └── main
+    │   │           └── resources
+    │   │               ├── 07122016_01.sql
+    │   │               └── employee.sql~
+    │   └── persistence
+    │       ├── READ ME
+    │       ├── READ ME~
+    │       └── src
+    │           └── main
+    │               └── resources
+    │                   ├── hibernate.cfg.xml
+    │                   └── hibernate.cfg.xml~
+    ├── READ ME
+    ├── READ ME~
+    └── utilities
+        ├── READ ME
+        ├── READ ME~
+        └── src
+            └── main
+                └── java
+                    └── com
+                        └── hibernate
+                            └── exercise6
+
+
+
+- create SQL files (.sql)
+	- employee table
+	- contact info table
+	- associate role table (associates role/s to a person)
+	- role table
+- create POJOs
+	- Person.java
+	- Name.java
+	- Address.java
+	- OtherInfo.java 
+- code
+	- App module
+		- GUI.java
+	- D
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

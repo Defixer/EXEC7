@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+<!-- <name> is the class name -->
+<!-- <table> created table in the db -->
+	<class name="Person" table="EMPLOYEE">
+		<meta attribute="class-description">
+		This class contains the employee detail.
+	</meta>
+	<id name="id" type="int" column="id">
+		<generator class="native"/>
+	</id>
+
+	<!-- <name> is the field in the class -->
+	<!-- <column> is the field in the table in db -->
+	<!-- <type> is the datatype of the corresponding field in the class -->
+	<property name="fname" column="first_name" type="string"/>
+	<property name="lname" column="last_name" type="string"/>
+	<property name="mname" column="middle_name" type="string"/>
+	<property name="suffix" column="suffix" type="string"/>
+	<property name="title" column="title" type="string"/>
+	<property name="streetNo" column="street_no" type="int"/>
+	<property name="brgy" column="brgy" type="string"/>
+	<property name="cityMunicipality" column="city_municipality" type="string"/>
+	<property name="zipCode" column="zipCode" type="int"/>
+	<property name="birthday" column="birthday" type="date"/>
+	<property name="hireDate" column="date_hired" type="date"/>
+	<property name="gwa" column="gwa" type="double"/>
+	<property name="isEmployed" column="currently_employed" type="boolean"/>
+	</class>
+</hibernate-mapping>
+

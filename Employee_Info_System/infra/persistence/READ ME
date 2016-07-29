@@ -1,0 +1,6 @@
+includes XML files (.xml)
+	- XML configurations
+	- database configurations
+	- hibernate configurations (hibernate.cfg.xml)
+	- mapping configurations
+root directory includes POM for persistence module

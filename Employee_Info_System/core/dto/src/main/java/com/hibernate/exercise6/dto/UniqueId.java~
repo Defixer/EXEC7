@@ -1,0 +1,12 @@
+package com.hibernate.exercise6.model;
+
+public abstract class UniqueIdDTO{	
+	private int uniqueId;
+	
+	public int getId(){
+		return uniqueId;
+	}	
+	public void setId(int uniqueId){
+		this.uniqueId = uniqueId;
+	}
+}

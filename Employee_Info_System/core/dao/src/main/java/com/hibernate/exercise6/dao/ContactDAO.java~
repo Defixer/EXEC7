@@ -1,0 +1,115 @@
+package com.hibernate.exercise6.dao;
+
+import com.hibernate.exercise6.model.Employee;
+import com.hibernate.exercise6.model.Contact;
+import com.hibernate.exercise6.utilities.HibernateUtil;
+
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Scanner;
+import java.util.List;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.HashSet;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class ContactDAO{
+	
+	private Scanner scan = new Scanner(System.in);
+	
+	private HibernateUtil hibernateUtil = new HibernateUtil();
+	
+	public void addContacts(Integer employeeID, String contactType, String contactDetails){		
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			Employee employee = (Employee)session.get(Employee.class, employeeID);
+			Set contacts = employee.getContacts();
+			Contact newContact = new Contact(contactDetails, contactType);
+			contacts.add(newContact);
+			session.update(employee);
+			transaction.commit();
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}finally{
+			session.close();
+		}
+	}
+	
+	public void updateContact(Integer employeeID, int contactID, String newValue){		
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			newValue = inputNewValue();
+			Employee employee = (Employee)session.get(Employee.class, employeeID);
+			Set contacts = employee.getContacts();
+			Contact thisContact = (Contact)session.get(Contact.class, contactID);
+			contacts.remove(thisContact);
+			thisContact.setContactDetails(newValue);
+			contacts.add(thisContact);
+			employee.setContacts(contacts);
+			session.update(employee);
+			transaction.commit();
+			System.out.println("\tContact successfully updated");		
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}finally{
+			session.close();
+		}		
+	}
+	
+	public void deleteContact(Integer employeeID, int contactID){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			Employee employee = (Employee)session.get(Employee.class, employeeID);
+			Contact thisContact = (Contact)session.get(Contact.class, contactID);
+			Set contacts = employee.getContacts();
+			contacts.remove(thisContact);
+			session.update(employee);
+			transaction.commit();
+			System.out.println("\tContact successfully deleted");			
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}finally{
+			session.close();
+		}	
+	}
+	
+	public String inputNewValue(){
+		String newValue = "";
+		
+		System.out.print("\tEnter new value: ");
+		newValue = scan.nextLine();
+		
+		return newValue;
+	}
+}

@@ -1,0 +1,50 @@
+public class Name{
+	private String fname,
+									lname,
+									mname,
+									suffix,
+									title;
+	
+	public Name(String fname, String lname, String mname, String suffix, String title){
+		this.fname = fname;
+		this.lname = lname;
+		this.mname = mname;
+		this.suffix = suffix;
+		this.title = title;
+	}
+	
+	public void setFirstName(String fname){
+		this.fname = fname;
+	}
+	public String getFirstName(){
+		return fname;
+	}
+	
+	public void setLastName(String lname){
+		this.lname = lname;
+	}
+	public String getLastName(){
+		return lname;
+	}
+	
+	public void setMiddleName(String mname){
+		this.mname = mname;
+	}
+	public String getMiddleName(){
+		return mname;
+	}
+	
+	public void setSuffix(String suffix){
+		this.suffix = suffix;
+	}
+	public String getsuffix(){
+		return suffix;
+	}
+	
+	public void setTitle(String title){
+		this.title = title;
+	}
+	public String getTitle(){
+		return title;
+	}
+}

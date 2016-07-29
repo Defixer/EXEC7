@@ -1,0 +1,4 @@
+includes java classes (.java) for
+	- POJOs
+	- information about entities
+root directory includes POM for model module

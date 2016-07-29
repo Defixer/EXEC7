@@ -1,0 +1,233 @@
+package com.hibernate.exercise6;
+
+import com.hibernate.exercise6.model.Employee;
+import com.hibernate.exercise6.model.Name;
+import com.hibernate.exercise6.model.Address;
+import com.hibernate.exercise6.model.OtherInfo;
+import com.hibernate.exercise6.model.Role;
+import com.hibernate.exercise6.service.Functions;
+
+
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Scanner;
+import java.util.List;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.HashSet;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class GUIMain{
+	private static SessionFactory factory;
+	private static Scanner scan = new Scanner(System.in);
+	
+	private static final String CONTACT_TYPE_LANDLINE = "landline";
+															CONTACT_TYPE_MOBILE = "mobile";
+															CONTACT_TYPE_EMAIL = "email".
+															DATE_FLAG = "y";
+	
+	public static void main(String[] args){		
+		int guiMenuChoice = 0;
+		
+		/*This is the utility class*/
+		try{
+			factory = new Configuration().configure().buildSessionFactory();
+		}catch(Throwable ex){
+			System.err.println("Failed to create sessionFactory object!!!\n\n" + ex);
+			throw new ExceptionInInitializerError(ex);			
+		}
+		
+		GUIMain gui = new GUIMain();
+		
+		System.out.println("Employee Information System");
+		System.out.println("[1] Add new Record");
+		System.out.println("[2] Update existing Record");
+		System.out.println("[3] Delete Record");
+		System.out.println("[4] List All Record");
+		guiMenuChoice = scan.nextInt(); scan.nextLine();
+		
+		switch(guiMenuChoice){
+			case 1:
+				newEmployeeRecord();
+			
+		}	
+	}
+	
+	public void newEmployeeRecord(){
+		Name nameInfo = gui.inputPersonalInfo();
+		Address addressInfo = gui.inputAddressInfo();
+		OtherInfo otherInfo = gui.inputOtherInfo();
+		HashSet contacts = gui.inputContactInfo();
+		Employee employee = new Employee(nameInfo, addressInfo, otherInfo, contacts);
+		employee.setContacts(contacts);
+		
+		Functions.createEmployeeRecord(employee);
+	}
+	
+	public Name inputPersonalInfo(){
+		String title,
+						firstName,
+						lastName,
+						middleName,
+						suffix;
+		
+		System.out.println("\tPersonal Information");
+		System.out.print("\t\tEnter title\t\t     : ");
+		title = scan.nextLine();		
+		System.out.print("\t\tEnter first name\t     : ");
+		firstName = scan.nextLine();
+		System.out.print("\t\tEnter middle name\t     : ");
+		middleName = scan.nextLine();
+		System.out.print("\t\tEnter last name\t\t     : ");
+		lastName = scan.nextLine();
+		System.out.print("\t\tEnter suffix (if applicable) : ");
+		suffix = scan.nextLine();		
+		
+		Name nameInfo = new Name(title, firstName, middleName, lastName, suffix);
+		
+		return nameInfo;
+	}
+	
+	public Address inputAddressInfo(){
+		String streetNo,
+						brgy,
+						cityMunicipality,
+						zipcode;
+		
+		System.out.println("\tAddress");
+		System.out.print("\t\tEnter Street No\t\t  : ");
+		streetNo = scan.nextLine();
+		System.out.print("\t\tEnter Barangay\t\t  : ");
+		brgy = scan.nextLine();
+		System.out.print("\t\tEnter City / Municipality : ");
+		cityMunicipality = scan.nextLine();
+		System.out.print("\t\tEnter ZIP Code\t\t  : ");
+		zipcode = scan.nextLine();
+		
+		Address addressInfo = new Address(streetNo, brgy, cityMunicipality, zipcode);
+		
+		return addressInfo;
+	}
+	
+	public OtherInfo inputOtherInfo(){
+		String bday,						
+						dateHired,
+						isWorking;
+		double gwa;
+		Date birthday,
+					hireDate;
+		boolean isEmployed;
+		
+		System.out.println("\tOther Information");
+		System.out.print("\t\tEnter Birthday (YYYY/MM/DD)    : ");
+		bday = scan.nextLine();
+		birthday = parseToDate(bday);
+		System.out.print("\t\tEnter General Weigthed Average : ");
+		gwa = scan.nextDouble(); scan.nextLine();
+		System.out.print("\t\tEnter Date Hired (YYYY/MM/DD)  : ");
+		dateHired = scan.nextLine();
+		hireDate = parseToDate(dateHired);
+		System.out.print("\t\tCurrent Employed? (Y/N)\t       : ");
+		isWorking = scan.nextLine();
+		isEmployed = employmentStatus(isWorking);
+		
+		OtherInfo otherInfo = new OtherInfo(birthday, hireDate, gwa, isEmployed);
+		
+		return otherInfo;
+	}
+	
+	public static Date parseToDate(String day) throws ParseException{
+		final String DATE_PATTERN = "yyyy/MM/dd";
+		SimpleDateFormat dayFormatter = new SimpleDateFormat(DATE_PATTERN);
+		Date date =  dayFormatter.parse(day);
+		return date;
+	}
+	
+	public static boolean employmentStatus(String isWorking){		
+		if(isWorking.equalsIgnoreCase(DATE_FLAG)){
+			return true;
+		}
+		return false;
+	}
+	
+	public void contactInfoMenu(){		
+		HashSet contacts = new HashSet();
+		System.out.println("\tContact Details");
+		System.out.println("\t[1] Add new Landline");
+		System.out.println("\t[2] Add new Mobile");
+		System.out.println("\t[3] Add new Email");
+		System.out.println("\t[4] Done");
+		inputContactInfo(contacts);
+	}
+	
+	public HashSet inputContactInfo(HashSet contacts){
+		int contactsMenuchoice = 0;
+		String contactDetailsFlag = "",
+						contactInfo = "";		
+		boolean inputNotDone = true;
+		HashSet contacts = new HashSet();
+		
+		while(inputNotDone){
+			System.out.println("\tContact Details");
+			System.out.println("\t[1] Add new Landline");
+			System.out.println("\t[2] Add new Mobile");
+			System.out.println("\t[3] Add new Email");
+			System.out.println("\t[4] Done");
+			System.out.print("Enter choice: ");
+			choice = scan.nextInt(); scan.nextLine();		
+		
+			switch(contactsMenuchoice){
+				case 1:
+					contactInfoFlag = "landline";
+					addContactInfo(contactInfoFlag,contacts);
+					break;
+				case 2:
+					contactDetailsFlag = "mobile";
+					addContactInfo(contactInfoFlag,contacts);
+					break;
+				case 3:
+					contactDetailsFlag = "email";
+					addContactInfo(contactInfoFlag,contacts);
+					break;
+				case 4:
+					inputNotDone = false;
+					break;
+			}		
+		}
+		
+		return contacts;		
+	}
+	
+	public void addContactInfo(String contactInfoFlag, HashSet contacts){
+		contactInfo = inputContactInfo(contactInfoFlag);
+		contacts.add(new Contact(contactInfo, contactInfoFlag));
+	}
+	
+	public String inputContactInfo(String contactInfoFlag){
+		String contactInfo,
+						wordNumber = "",
+						wordAddress = "";
+		
+		if(contactInfoFlag.equals(CONTACT_TYPE_MOBILE)){
+			wordNumber = " Number";
+		}
+		else if(contactInfoFlag.equals(CONTACT_TYPE_EMAIL)){
+			wordAddress = " Address";
+		}
+		
+		System.out.print("\n\t\tEnter new " + contactInfoFlag + wordNumber + wordAddress + ": ");
+		contactInfo = scan.nextLine();
+		
+		return contactInfo;		
+	}	
+}

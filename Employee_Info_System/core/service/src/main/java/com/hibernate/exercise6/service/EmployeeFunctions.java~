@@ -1,0 +1,423 @@
+package com.hibernate.exercise6.service;
+
+import com.hibernate.exercise6.dao.PersonDAO;
+import com.hibernate.exercise6.dao.RoleDAO;
+import com.hibernate.exercise6.model.Employee;
+import com.hibernate.exercise6.model.Name;
+import com.hibernate.exercise6.model.Address;
+import com.hibernate.exercise6.model.OtherInfo;
+import com.hibernate.exercise6.model.Contact;
+import com.hibernate.exercise6.model.Role;
+import com.hibernate.exercise6.utilities.HibernateUtil;
+
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.text.MessageFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Scanner;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Date;
+import java.util.NoSuchElementException;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.Query;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class EmployeeFunctions{
+	PersonDAO personDAO = new PersonDAO();
+	private final String BY_NAME = "by name",
+												BY_GWA = "by gwa",
+												BY_HIRE_DATE = "by hire date",
+												DATE_FLAG = "y";
+	private HibernateUtil hibernateUtil = new HibernateUtil();
+	private Employee employee;
+	
+	public void createEmployeeRecord(Employee employee){
+		personDAO.addEmployee(employee);
+	}
+	
+	public boolean deleteEmployeeRecord(Integer employeeID){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopRecordMenu = true;
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			employee = (Employee)session.get(Employee.class, employeeID);
+						
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}		
+		
+		personDAO.deleteEmployeeRecord(employee);
+		return loopRecordMenu;
+	}
+	
+	public boolean switchUpdateRecord(Integer employeeID, int recordInfoChoice, String newValue) throws ParseException{
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopRecordMenu = true;
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();			
+			employee = (Employee)session.get(Employee.class, employeeID);
+			
+			if(recordInfoChoice >= 1 && recordInfoChoice <= 5){
+				Name name = employee.getName();
+				name = executeUpdateName(recordInfoChoice, newValue, name);
+				employee.setName(name);				
+			}
+			else if(recordInfoChoice >=6 && recordInfoChoice <=9){
+				Address address = employee.getAddress();
+				address = executeUpdateAddress(recordInfoChoice, newValue, address);
+				employee.setAddress(address);
+			}
+			else if(recordInfoChoice >=10 && recordInfoChoice <=13){
+				OtherInfo otherInfo = employee.getOtherInfo();
+				otherInfo = executeUpdateOtherInfo(recordInfoChoice, newValue, otherInfo, DATE_FLAG);
+				employee.setOtherInfo(otherInfo);
+			}
+			
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+		finally{
+			session.close();
+		}		
+
+		personDAO.updateRecord(employee, recordInfoChoice);
+		return loopRecordMenu;
+	}
+	
+	public Name executeUpdateName(int recordInfoChoice, String newValue, Name name){
+	switch(recordInfoChoice){
+		case 1:
+			name.setTitle(newValue);
+			break;
+		case 2:
+			name.setFirstName(newValue);
+			break;
+		case 3:
+			name.setMiddleName(newValue);
+			break;
+		case 4:
+			name.setLastName(newValue);
+			break;
+		case 5:
+			name.setSuffix(newValue);
+			break;			
+	}
+		
+		return name;
+	}
+	
+	public Address executeUpdateAddress(int recordInfoChoice, String newValue, Address address){
+		switch(recordInfoChoice){
+			case 6:
+				address.setStreetNo(newValue);
+				break;
+			case 7:
+				address.setBrgy(newValue);
+				break;
+			case 8:
+				address.setCityMunicipality(newValue);
+				break;
+			case 9:
+				address.setZipcode(newValue);
+				break;
+		}
+		
+		return address;
+	}
+	
+	public OtherInfo executeUpdateOtherInfo(int recordInfoChoice, String newValue, OtherInfo otherInfo, String DATE_FLAG) throws ParseException{		
+		switch(recordInfoChoice){
+			case 10:
+				Date birthday = parseToDate(newValue);
+				otherInfo.setBirthday(birthday);
+				break;
+			case 11:
+				double gwa = Double.parseDouble(newValue);
+				otherInfo.setGwa(gwa);
+				break;
+			case 12:
+				Date hireDate = parseToDate(newValue);
+				otherInfo.setHireDate(hireDate);
+				break;
+			case 13:
+				boolean isEmployed = newValue.equals(DATE_FLAG) ? true:false;
+				otherInfo.setIsEmployed(isEmployed);
+				break;
+		}
+		
+		return otherInfo;
+	}
+	
+	public boolean listEmployees(String listFlag){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		boolean loopMain = true;
+				
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();			
+			
+			System.out.print("\n\nEMPLOYEE RECORDS (ALL)\n");
+			System.out.print("------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+			
+			if(listFlag.equals(BY_NAME)){ //by Criteria sort
+				System.out.println("Sort by Last Name");
+				Criteria criteria = session.createCriteria(Employee.class);
+				List employeeList = criteria.list();
+				iterateEmployeeList(employeeList);				
+			}
+			else if(listFlag.equals(BY_GWA)){ //by Comparator sort
+				System.out.println("Sort by GWA");
+				List employeeList = session.createQuery("FROM Employee").list();
+				Collections.sort(employeeList, Employee.employeeGwaComparator);
+				iterateEmployeeList(employeeList);
+			}
+			else if(listFlag.equals(BY_HIRE_DATE)){ //by Query sort
+				System.out.println("Sort by Date Hired");
+				String hql = "FROM Employee ORDER BY hireDate";
+				Query query = session.createQuery(hql);
+				List employeeList = query.list();
+				iterateEmployeeList(employeeList);
+			}			
+			transaction.commit();
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}		
+		}finally{
+			session.close();
+		}
+		System.out.print("\n------------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n");
+		
+		return loopMain;
+	}
+	
+	public void iterateEmployeeList(List employeeList){
+		System.out.print("\nID  Name\t\t\t\tAddress\t\t\tOther Information\t\t\tContact Information\t   Roles");
+			
+		for(Iterator employeeIterator = employeeList.iterator(); employeeIterator.hasNext();){
+				
+			employee = (Employee)employeeIterator.next();
+			Name name = employee.getName();
+			Address address = employee.getAddress();
+			OtherInfo otherInfo = employee.getOtherInfo();			
+		
+			displayEmployeeBackground(employee, name, address, otherInfo);					
+		 									
+		 	Set roles = employee.getRole();		 	
+		 	List thisEmployeeRoles = employeeRolesToList(roles);
+		
+			Set contacts = employee.getContacts();
+			Map thisEmployeeContacts = employeeContactsToMap(contacts);
+		
+			int employeeContactMapSize = thisEmployeeContacts.size();
+			int employeeRoleListSize = thisEmployeeRoles.size();				
+		
+			displayContactsAndRoles(employeeContactMapSize, employeeRoleListSize, thisEmployeeContacts, thisEmployeeRoles, contacts, roles);
+			}
+	}
+	
+	public void displayEmployeeBackground(Employee employee, Name name, Address address, OtherInfo otherInfo){
+		String employeeNameField = MessageFormat.format("\n{0}   {1}. {2} {3} {4} {5}", String.valueOf(employee.getId()), (String)name.getTitle(), (String)name.getFirstName(), (String)name.getMiddleName(), (String)name.getLastName(), (String)name.getSuffix());
+		String employeeAddressField = MessageFormat.format("\t{0} {1} {2} {3}",(String)address.getStreetNo(), (String)address.getBrgy(), (String)address.getCityMunicipality(), (String)address.getZipcode());
+	
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+		Date bday = otherInfo.getBirthday();
+		Date dateHired = otherInfo.getHireDate();
+		String birthday = dateFormat.format(bday);
+		String hireDate = dateFormat.format(dateHired);
+	
+		DecimalFormat twoDecimalPlace = new DecimalFormat("#.##");
+		
+		String employeeOtherInfoField = MessageFormat.format("\t{0} {1} {2} {3} ", birthday, hireDate, String.valueOf(otherInfo.getIsEmployed()), String.valueOf(twoDecimalPlace.format(otherInfo.getGwa())));
+	
+		System.out.print(employeeNameField + employeeAddressField + employeeOtherInfoField);	
+	}
+	
+	public void displayContactsAndRoles(int employeeContactMapSize, int employeeRoleListSize, Map thisEmployeeContacts, List thisEmployeeRoles, Set contacts, Set roles){		
+		
+		if(employeeContactMapSize >= employeeRoleListSize){
+			moreContactsThanRoles(contacts, thisEmployeeRoles);
+		}				
+		else if(employeeContactMapSize < employeeRoleListSize){
+			moreRolesThanContacts(roles, thisEmployeeContacts);
+		}
+			
+	}
+	
+	public List employeeRolesToList(Set roles){	
+		List thisEmployeeRoles = new ArrayList();
+		
+		for(Iterator roleIterator = roles.iterator(); roleIterator.hasNext();){
+			Role roleName = (Role)roleIterator.next();
+			thisEmployeeRoles.add(roleName.getRoleName());
+		}	
+		
+		return thisEmployeeRoles;
+	}
+	
+	public Map employeeContactsToMap(Set contacts){
+		Map thisEmployeeContacts = new HashMap();
+		
+		for(Iterator contactIterator = contacts.iterator(); contactIterator.hasNext();){
+			Contact contactDetails = (Contact)contactIterator.next();
+			thisEmployeeContacts.put(contactDetails.getContactDetails(), contactDetails.getContactType());
+		}
+		
+		return thisEmployeeContacts;
+	}
+	
+	public void moreContactsThanRoles(Set contacts, List thisEmployeeRoles){
+		int roleCtr = 0,
+				roleCtrChecker = 0;
+		for(Iterator contactIterator = contacts.iterator(); contactIterator.hasNext();){
+			String thisEmployeeRoleName = "";
+			Contact contactDetails = (Contact)contactIterator.next();
+		
+			if(roleCtr == roleCtrChecker){
+				try{
+					thisEmployeeRoleName = (String)thisEmployeeRoles.get(roleCtr);
+				}catch(IndexOutOfBoundsException iobe){
+					System.out.print("");
+				}		
+			}					
+			System.out.println("\t[" + contactDetails.getContactType() + "]    " + contactDetails.getContactDetails() + "\t   " + thisEmployeeRoleName);
+			System.out.print("\t\t\t\t\t\t\t\t\t\t\t         ");
+			roleCtrChecker++;
+			roleCtr++;
+			try{
+				thisEmployeeRoles.get(roleCtr);
+			}catch(IndexOutOfBoundsException iobe){
+				System.out.print("");
+				roleCtr--;
+			}
+		}
+	}
+	
+	public void moreRolesThanContacts(Set roles, Map thisEmployeeContacts){
+		String openBrace = "\t[",
+						closeBrace = "]    ",
+						tabSequence1 = "\t",
+						tabSequence2 = "\t\t\t\t\t\t\t\t\t\t\t         ";
+	
+		Set set = thisEmployeeContacts.entrySet();
+		Iterator mapIterator = set.iterator();
+		
+		for(Iterator roleIterator = roles.iterator(); roleIterator.hasNext();){
+			String thisEmployeeContactDetails = "";
+			String thisEmployeeContactType = "";
+			Role roleDetails = (Role)roleIterator.next();			
+		
+			try{
+				Map.Entry mapEntry = (Map.Entry)mapIterator.next();
+				thisEmployeeContactDetails = (String)mapEntry.getKey();
+				thisEmployeeContactType = (String)mapEntry.getValue();
+			}catch(NoSuchElementException nsee){
+				System.out.print("");
+				openBrace = "";
+				closeBrace = "";
+				tabSequence1 = "\t\t\t\t   ";
+				tabSequence2 = "\t\t\t\t\t\t\t\t\t\t\t   ";
+			}
+		
+			System.out.println(openBrace + thisEmployeeContactType + closeBrace + thisEmployeeContactDetails + tabSequence1 + roleDetails.getRoleName());
+			System.out.print(tabSequence2);
+		}		
+	}
+	
+	public static Date parseToDate(String day) throws ParseException{
+		final String DATE_PATTERN = "yyyy/MM/dd";
+		SimpleDateFormat dayFormatter = new SimpleDateFormat(DATE_PATTERN);
+		Date date =  dayFormatter.parse(day);
+		return date;
+	}
+	
+	public void displayRecordInfo(Integer employeeID){
+		SessionFactory factory = hibernateUtil.getSessionFactory();
+		
+		Session session = factory.openSession();
+		Transaction transaction = null;
+		
+		try{
+			transaction = session.beginTransaction();
+			employee = (Employee)session.get(Employee.class, employeeID);
+			Name name = employee.getName();
+			Address address = employee.getAddress();
+			OtherInfo otherInfo = employee.getOtherInfo();
+			
+			displayNameInfo(name);
+			displayAddressInfo(address);
+			displayOtherInfo(otherInfo);		
+		}catch(HibernateException e){
+			if(transaction != null){
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}finally{
+			session.close();
+		}			
+	}
+	
+	public void displayNameInfo(Name name){
+		System.out.println("\n\t\tPersonal Information");
+		System.out.println("\t\t[1]  Title       : " + name.getTitle());
+		System.out.println("\t\t[2]  First Name  : " + name.getFirstName());
+		System.out.println("\t\t[3]  Middle Name : " + name.getMiddleName());
+		System.out.println("\t\t[4]  Last Name   : " + name.getLastName());
+		System.out.println("\t\t[5]  Suffix      : " + name.getSuffix());
+	}
+	
+	public void displayAddressInfo(Address address){
+		System.out.println("\t\tAddress Information");
+		System.out.println("\t\t[6]  Street No.        : " + address.getStreetNo());
+		System.out.println("\t\t[7]  Brgy              : " + address.getBrgy());
+		System.out.println("\t\t[8]  City/Municipality : " + address.getCityMunicipality());
+		System.out.println("\t\t[9]  Zipcode           : " + address.getZipcode());
+	}
+	
+	public void displayOtherInfo(OtherInfo otherInfo){
+		System.out.println("\t\tOther Information");
+		System.out.println("\t\t[10] Birthday           : " + otherInfo.getBirthday());
+			
+		DecimalFormat twoDecimalPlace = new DecimalFormat("#.##");
+		System.out.println("\t\t[11] GWA                : " + twoDecimalPlace.format(otherInfo.getGwa()));
+		System.out.println("\t\t[12] Date Hired         : " + otherInfo.getHireDate());
+		System.out.println("\t\t[13] Currently Employed : " + otherInfo.getIsEmployed());
+	}	
+}

@@ -1,0 +1,32 @@
+package com.hibernate.exercise6;
+
+public class Functions{
+	public void deleteEmployeeRecord(){
+		System.out.println("\tEnter employee last name: ");
+		//list all matching employee record
+		//enter choice for employee record to be deleted
+			//prompt 'are you sure you want to delete this record (Y/N)'
+	}
+	
+	public void sortByName(){
+		//comparator sort alphabetical last name
+	}
+	
+	public void sortByHireDate(){
+		//comparator sort most recent hire date
+	}
+	
+	public void sortByGWA(){
+		//comparator sort highest -> lowest GWA
+	}
+	
+	public void deleteRole(){
+		//list all roles in role table from database
+		System.out.printlnI("Enter role to be deleted: ");
+		//update role table in database
+	}
+	
+	public void listRole(){
+		//list all roles in role table from database
+	}
+}

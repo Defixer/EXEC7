@@ -1,0 +1,5 @@
+includes java classses (.java)
+	-	Front End GUI
+	- User Inputs
+	- *may include output / results
+root directory includes the POM for app module

@@ -1,0 +1,44 @@
+package com.hibernate.exercise6;
+
+public class Person{
+	private Name nameInfo;
+	private Address addressInfo;
+	private OtherInfo otherInfo;
+	private Contact contactInfo;
+	private Role roleInfo;
+	private int id;
+	
+	public Person(Name nameInfo, Address addressInfo, OtherInfo otherInfo){
+		this.nameInfo = nameInfo;
+		this.addressInfo = addressInfo;
+		this.otherInfo = otherInfo;	
+	}
+	
+	public void setId(){
+		this.id = id;
+	}
+	public int getId(){
+		return id;
+	}	
+	
+	public void setName(Name nameInfo){
+		this.nameInfo = nameInfo;
+	}
+	public Name getName(){
+		return nameInfo;
+	}
+	
+	public void setAddress(Address addressInfo){
+		this.addressInfo = addressInfo;
+	}
+	public Address getAddress(){
+		return addressInfo;
+	}
+	
+	public void setOtherInfo(OtherInfo otherInfo){
+		this.otherInfo = otherInfo;
+	}
+	public OtherInfo getOtherInfo(){
+		return otherInfo;
+	}
+}

@@ -1,0 +1,253 @@
+package com.hibernate.exercise6;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
+import  java.util.Date;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.Query;
+import org.hibernate.HibernateException;
+
+public class GUI{
+	static Scanner scan = new Scanner(System.in);
+	private static SessionFactory factory;
+	
+	public static void main(String[] args){
+		try{
+			factory = new Configuration().configure().buildSessionFactory();
+		}catch(Throwable ex){
+			System.err.println("Failed to create sessionFactory object" + ex);
+			throw new ExceptionInInitializerError(ex);
+		}
+		
+		GUI gui = new GUI();		
+		
+		System.out.println("Employee Information System");
+		System.out.println("====================================");
+		System.out.println("[1] Register New Employee Record");
+		inputEmployeeInfo();		
+		/*System.out.println("[2] Update Existing Employee Record");
+		//editEmployeeInfo();		
+		System.out.println("[3] Delete Employee Record");
+		//deleteEmployeeRecord();		
+		System.out.println("[4] List Record");
+		//listMenu();		
+		System.out.println("[5] Role");
+		//roleMenu();*/	
+	}
+	
+	public static void inputEmployeeInfo(){
+		String fname,
+						lname,
+						mname,
+						suffix,
+						title,
+						brgy,
+						cityMunicipality,
+						bday,
+						dateHired,
+						isWorking;
+		int streetNo,
+				zipCode,
+				gwa;		
+		Date birthday,
+					hireDate;
+		boolean isEmployed;						
+		
+		System.out.println("\tPersonal Information")
+		System.out.println("\t\tEnter first name: ")
+		fname = scan.nextLine();
+		System.out.println("\t\tEnter middle name: ");
+		mname = scan.nextLine();
+		System.out.println("\t\tEnter last name: ");
+		lname = scan.nextLine();
+		System.out.println("\t\tEnter suffix (if applicable): ");
+		suffix = scan.nextLine();
+		System.out.println("\t\tEnter title: ");
+		title = scan.nextLine();
+		
+		Name nameInfo = new Name(fname, lname, mname, suffix, title);
+		
+		System.out.println("\tAddress")
+		System.out.println("\t\tEnter Street No: ");
+		streetNo = scan.nextInt(); scan.nextLine();
+		System.out.println("\t\tEnter Barangay: ");
+		brgy = scan.nextLine();
+		System.out.println("\t\tEnter City / Municipality: ");
+		cityMunicipality = scan.nextLine();
+		System.out.println("\t\tEnter ZIP Code: ");
+		zipCode = scan.nextInt(); scan.nextLine();
+		
+		Address addressInfo = new Address(streetNo, brgy, cityMunicipality, zipCode);
+		
+		System.out.println("\tOther Information");
+		System.out.println("\t\tEnter Birthday (MM/DD/YYYY): ");
+		bday = scan.nextLine();
+		birthday = inputDate(bday);
+		System.out.println("\t\tEnter GWA: ");
+		gwa = scan.nextInt(); scan.nextLine();
+		System.out.println("\t\tEnter Date Hired (MM/DD/YYYY): ");
+		dateHired = scan.nextLine();
+		hireDate = inputDate(dateHired);
+		System.out.println("\t\tCurrent Employed? (Y/N): ");
+		isWorking = scan.nextLine();
+		setEmploymenStatus(isWorking);
+		isEmployed = getEmploymentStatus();
+		
+		OtherInfo otherInfo = new OtherInfo(birthday, hireDate, gwa, isEmployed)		
+		
+		Person person = new Person(nameInfo, addressInfo, otherInfo);
+		
+		Configuration config = new Configuration().configure();
+		Standard
+
+		//add later
+		/*
+		System.out.println("\tContact Information");
+		System.out.println("\t\t[1] Landline");
+		System.out.println("\t\t\tEnter Landline No: ");
+		System.out.println("\t\t[2] Mobile");
+		System.out.println("\t\t\tEnter Mobile No: ");
+		System.out.println("\t\t[3] Email Address");
+		System.out.println("\t\t\tEnter Email Address: ");
+		System.out.println("\t\t[4] Done");
+		
+		System.out.println("\tRole");
+		System.out.println("\t\t[1] Associate new role");
+		System.out.println("\t\t\t[1] Software Developer");
+		System.out.println("\t\t\t[2] Quality Assurance Engineer");
+		System.out.println("\t\t\t[3] Infrastructure Engineer");
+		System.out.println("\t\t\t[4] Finance Officer");
+		System.out.println("\t\t\t[5] Human Resources Officer");
+		*/
+		
+		//pass to service module
+	}
+	
+	
+	/*
+	public static void editEmployeeRecord(){
+		System.out.println("Enter last name of employee record to be updated: ");
+		//list all matching employee record
+		//choose the desired employee record to be updated
+		System.out.println("\t[1] Personal Information")
+		System.out.println("\t\t[1] Edit first name: ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[2] Edit middle name: ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[3] Edit last name: ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[4] Edit suffix (if applicable): ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[5] Edit title: ");
+		System.out.println("\t\t\tEnter new value: ");
+		
+		System.out.println("\t[2] Address")
+		System.out.println("\t\t[1] Edit Street No: ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[2] Edit Barangary: ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[3] Edit City / Municipality: ");
+		System.out.println("\t\t\tEnter new value: ");		
+		System.out.println("\t\t[4] Edit ZIP Code: ");
+		System.out.println("\t\t\tEnter new value: ");
+		
+		System.out.println("\t[3] Other Information");
+		System.out.println("\t\t[1] Edit Birthday (MM-DD-YYYY): ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[2] Edit GWA: ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[3] Edit Date Hired: ");
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\tCurrent Employed? (Y/N): ");
+		System.out.println("\t\t\tEnter new value: ");
+		
+		System.out.println("\t[4] Contact Information");
+		System.out.println("\t\t[1] Landline");
+		System.out.println("\t\t\t[1] Landline No #1: ");
+		//choose desired contact info to be updated
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[2] Mobile");
+		System.out.println("\t\t\t[1] Mobile No #1: ");
+		//choose desired contact info to be updated
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[3] Email Address");
+		System.out.println("\t\t\t[1] Email Address #1");
+		//choose desired contact info to be updated
+		System.out.println("\t\t\tEnter new value: ");
+		System.out.println("\t\t[4] Done");
+		
+		System.out.println("\t[5] Role");
+		System.out.println("\t\t[1] Associate new role");
+		System.out.println("\t\t\t[1] Software Developer");
+		System.out.println("\t\t\t[2] Quality Assurance Engineer");
+		System.out.println("\t\t\t[3] Infrastructure Engineer");
+		System.out.println("\t\t\t[4] Finance Officer");
+		System.out.println("\t\t\t[5] Human Resources Officer");
+		System.out.println("\t\t[2] Delete existing role");
+		//list all existing roles
+		//choose desired role to be deleted
+		//update role table in database
+		
+		
+		//pass to service module
+	}
+		
+	public static void listMenu(){
+		System.out.println("\t[1] Sort by Name"); //alphabetical last name
+		sortByName();
+		System.out.println("\t[2] Sort by Hire Date"); //most recent hire
+		sortByHireDate();
+		System.out.println("\t[3] Sort by GWA"); //highest GWA
+		sortByGWA();
+		System.out.println("\tEnter choice: ");
+	}
+	
+	public static void roleMenu(){
+		System.out.println("\t[1] Add new role");
+		addNewRole();
+		System.out.println("\t[2] Update role");
+		updateRole();
+		System.out.println("\t[3] Delete role");
+		deleteRole();
+		System.out.println("\t[4] List role");	
+		listRole(); //no need any sorting
+		System.out.print("Enter choice: ");
+	}
+	
+	public static void addNewRole(){
+		System.out.println("Enter new role: ");
+		//update role table in database
+		
+		//pass to service module
+	}
+	
+	public static void updateRole(){
+		//list all roles in role table from database
+		//edit role name of existing role
+		System.out.println("Enter new value: ");
+		//update role table in database
+		
+		
+		//pass to service module
+	}
+	*/
+	
+	public static Date inputDate(String day){
+		final String DATE_PATTERN = "MM/DD/YYYY";
+		SimpleDateFormat dayFormatter = new SimpleDateFormat(DATE_PATTERN);
+		
+		try{
+			Date date = dayFormatter.parse(day);
+		
+		}catch(ParseException e){
+			e.printStackTrace();
+		}
+		
+		return date;
+	}
+}

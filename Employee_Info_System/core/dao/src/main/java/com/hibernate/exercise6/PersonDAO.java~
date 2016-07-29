@@ -1,0 +1,14 @@
+package com.hibernate.exercise6;
+
+public class PersonDAO{
+	private static SessionFactory fact
+	
+	public void addEmployee(Person person){
+		Session session = factory.openSession();
+		session.beginTransaction();
+		session.save(person);
+		session.getTransaction().commit();
+		System.out.println("Person Created");
+		session.close();
+	}
+}

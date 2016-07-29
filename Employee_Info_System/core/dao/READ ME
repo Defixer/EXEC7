@@ -1,0 +1,5 @@
+includes all java classes (.java) for
+	- data access objects
+		- database connections
+		- querying
+root directory includes POM for dao module

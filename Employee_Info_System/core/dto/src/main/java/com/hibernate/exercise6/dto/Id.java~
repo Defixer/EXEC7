@@ -1,0 +1,21 @@
+package com.hibernate.exercise6.model;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.MappedSuperclass;
+
+@MappedSuperclass
+public abstract class UniqueId{
+	@Id
+	@GeneratedValue
+	@Column(name = "id", nullable = false, updatable = false)
+	private int uniqueId;
+	
+	public int getId(){
+		return uniqueId;
+	}	
+	public void setId(int uniqueId){
+		this.uniqueId = uniqueId;
+	}
+}

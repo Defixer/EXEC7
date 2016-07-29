@@ -1,0 +1,42 @@
+package com.hibernate.exercise6;
+
+public class Address{
+	private int streetNo,
+							zipCode;
+	private String brgy,
+									cityMunicipality;
+	public Address(int streetNo, String brgy, String cityMunicipality, int zipCode){
+		this.streetNo = streetNo;
+		this.brgy = brgy;
+		this.cityMunicipality = cityMunicipality;
+		this.zipCode = zipCode;
+	}
+	
+	public void setStreetNo(int streetNo){
+		this.streetNo = streetNo;
+	}
+	public int getStreetNo(){
+		return streetNo;
+	}
+	
+	public void setBrgy(String brgy){
+		this.brgy = brgy;
+	}
+	public String getBrgy(){
+		return brgy;
+	}
+	
+	public void setCityMunicipality(String cityMunicipality){
+		this.cityMunicipality = cityMunicipality;
+	}
+	public String getCityMunicipality(){
+		return cityMunicipality;
+	}
+	
+	public void setZipCode(int zipCode){
+		this.zipCode = zipCode;
+	}
+	public int getZipCode(){
+		return zipCode;
+	}
+}

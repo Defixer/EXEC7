@@ -1,0 +1,45 @@
+package com.hibernate.exercise6;
+
+public class OtherInfo{
+	private Date birthday,
+								hireDate;
+	private double gwa;
+	private boolean isEmployed;
+	
+	private final String DATE_PATTERN = "y";
+		
+	public OtherInfo(Date birthday, Date hireDate, int GWA, boolean isEmployed){
+		this.birthday = birthday;
+		this.hireDate = hireDate;
+		this.gwa = gwa;
+		this.isEmployed = isEmployed;
+	}
+	
+	public void setBirthday(Date birthday){
+		this.birthday = birthday;
+	}
+	public Date getBirthday(){
+		return birthday;
+	}
+	
+	public void setGWA(double gwa){
+		this.gwa = gwa;
+	}
+	public int getGWA(){
+		return gwa
+	}
+	
+	public void setHireDate(Date hireDate){
+		this.hireDate = hireDate;
+	}
+	public Date getHireDate(){
+		return hireDate;
+	}
+	
+	public void setEmploymentStatus(String isWorking){
+		this.isEmployed = isWorking.equalsIgnoreCase(DATE_PATTERN) ? true:false;
+	}
+	public boolean getEmploymentStatus(){
+		return isEmployed;
+	}
+}
